@@ -1,5 +1,7 @@
 (ns app
-  (:require ["moment$default" :as moment]))
+  (:require ["moment$default" :as mmt]
+            ["inquirer$default" :as inq]
+            [promesa.core :as p]))
 
 (+ 1 1)
 
@@ -7,8 +9,17 @@
 
 (abcd 1)
 
-(prn (js->clj (moment/max)))
-( (.max (moment)))
-;; => #object[Moment Wed Jan 25 2023 18:57:16 GMT-0700]
-(let [a (moment/max)]
+(prn (js->clj (mmt/max)))
+(.max (mmt))
+(let [a (mmt/max)]
+  (prn (.toString a))
   (.toString a)) 
+
+(def questions (clj->js [{:name "name"
+                          :type "input"
+                          :message "who are you?"}]))
+
+
+
+(p/let [x (inq/prompt questions)]
+  x)
