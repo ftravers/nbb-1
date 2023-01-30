@@ -4,48 +4,58 @@
    [promesa.core :as p]
    ["ink" :refer [render Text Box]]
    [reagent.core :as r]
-   [nbb.core :refer [await]]
+   ;; [nbb.core :refer [await]]
+   [share.lib :as l]
    ;; [cljs.core.async :refer [go]]
    ;; [cljs.core.async.interop :refer-macros [<p!]]
    ))
 
-(defonce state
+;; TODO: auto send commands to vterm to run nbb app.
+(def state
   (r/atom
-   {:dev
-    {:check-roundtrip true
-     :check-roundtrip-interval-sec 60
-     :ms
-     {:rs true
-      :pr {:ok true}
-      :pns {:ok true}
-      :es {:ok true}}}
+   {:dev {:check-roundtrip true
+          :check-roundtrip-interval-sec 60
+          :ms {:rs-ok true
+               :pr-ok true
+               :pns-ok true
+               :es-ok true}}
 
-    :stg
-    {:rs {:ok true}
-     :pr {:ok true}
-     :pns {:ok true}
-     :es {:ok true}}
+    :stg {:check-roundtrip true
+          :check-roundtrip-interval-sec 60
+          :ms {:rs-ok true
+               :pr-ok false
+               :pns-ok true
+               :es-ok true}}
 
-    :prod
-    {:rs {:ok true}
-     :pr {:ok true}
-     :pns {:ok true}
-     :es {:ok true}}}))
+    :prod {:check-roundtrip true
+           :check-roundtrip-interval-sec 60
+           :ms {:rs-ok true
+                :pr-ok true
+                :pns-ok true
+                :es-ok true}}}))
+(-> @state :stg :ms)
+
+
+
 
 (defn ok-status [env]
   (let [e (-> @state env :ms)]
-    (if (every? (= :ok )))
-    )
+    ^{:key env}
+    [:> Box
+     [:> Box {:width 5}
+      [:> Text env]]
+     [:> Box
+      (if (every? #(= true (val %)) e)
+        [:> Text {:color "green"} "Everything is good."]
+        [:> Text {:color "red"} "FAILED!!!"]
+        )]])
   )
 (defn main []
-  [:> Box {:width 20 :padding 1}
-   [ok-status :dev]
-   [:> Text {:color "green"} "Hello World"]
-   [:> Box {:width 10
-            :padding 1
-            :backgroundColor "red"}
-    [:> Text {:color "green"} "Hello World"]]
-   [:> Text {:color "green"} "I'm funny"]])
+  [:> Box {:flexDirection "column"}
+   [:> Box
+    [:> Box {:width 5} [:> Text {:color "blue"} "ENV"]]
+    [:> Box [:> Text {:color "blue"} "OK Status"]]]
+   (map ok-status [:dev :stg :prod])])
 
 (render (r/as-element [main]))
 
@@ -91,3 +101,7 @@
   ;; {:main-menu "deploy"}
   ;; {:alphabet ["B" "C"]}
   )
+
+
+
+
