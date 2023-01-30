@@ -1,6 +1,6 @@
 (ns app
   (:require ;; ["moment$default" :as mmt]
-   ["ink" :refer [render Text Box]]
+   ["ink" :refer [render Text Box useInput]]
    [reagent.core :as r]
    [share.lib :as l]
    [clojure.string :as s]
@@ -20,7 +20,7 @@
           :check-roundtrip-interval-sec 60
           :ms {:rs-ok true
                :pr-ok false
-               :pns-ok true
+               :pns-ok false
                :es-ok true}}
 
     :prod {:check-roundtrip true
@@ -30,7 +30,7 @@
                 :pns-ok true
                 :es-ok true}}}))
 
-(defn ok-status [env]
+(defn ok-status [state env]
   (let [e (-> @state env :ms)]
     ^{:key env}
     [:> Box
@@ -40,19 +40,26 @@
       (if (every? #(= true (val %)) e)
         [:> Text {:color "green"} "Everything is good."]
         [:> Text {:color "red"}
-         (->> env
-              (l/get-failed state)
-              (mapv l/clean-ms)
-              s/join)])]])
+         (str "Failed MSs: "
+              (->> env
+                   (l/get-failed state)
+                   (mapv l/clean-ms)
+                   (s/join " ")))])]])
   )
-(defn main []
+
+()
+(defn main [state]
   [:> Box {:flexDirection "column"}
    [:> Box
     [:> Box {:width 5} [:> Text {:color "blue"} "ENV"]]
     [:> Box [:> Text {:color "blue"} "OK Status"]]]
-   (map ok-status [:dev :stg :prod])])
+   (map #(ok-status state %) [:dev :stg :prod])
+   ;; (useInput handle-input)
 
-(render (r/as-element [main]))
+
+   ])
+
+(render (r/as-element [main state]))
 
 (defn main-loop [state]
   (js/setTimeout #(main-loop state) 3000)
