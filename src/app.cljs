@@ -33,10 +33,6 @@
                 :pr-ok true
                 :pns-ok true
                 :es-ok true}}}))
-(-> @state :stg :ms)
-
-
-
 
 (defn ok-status [env]
   (let [e (-> @state env :ms)]
@@ -59,48 +55,13 @@
 
 (render (r/as-element [main]))
 
-(comment
-  (def questions (clj->js [ ;; {:name "name"
-                           ;;  :type "input"
-                           ;;  :message "who are you?"}
-                           ;; {:name "main-menu"
-                           ;;  :choices [{:name "a" :value "A"}
-                           ;;            {:name "b" :value "B"}
-                           ;;            {:name "q" :value "q"}]
-                           ;;  :type "checkbox"
-                           ;;  :message "who are you?"}
-                           {:name "main-menu"
-                            :choices ["quit" "deploy" "health-check"]
-                            :type "list"
-                            :message "who are you?"}]))
+(defn main-loop [state]
+  (js/setTimeout #(main-loop state) 3000)
+  (swap! state update-in [:stg :ms :pr-ok] not))
 
-  (defn prompt-user []
-    (p/let [_answers (inq/prompt questions)
-            answers (js->clj _answers :keywordize-keys true)]
-      (swap! state assoc :prompting-user true)
-      (case (-> answers :main-menu)
-        "quit" (swap! state assoc :quit true) 
-        "deploy" (swap! state assoc :deploy true))))
+(main-loop state)
 
 
-  (while (-> @state :quit not)
-    (await
-     (prompt-user)
-     (prn @state)))
-
-  ;; (prompt-user)
-  ;; (p/let [_answers (inq/prompt questions)
-  ;;         answers (js->clj _answers :keywordize-keys true)]
-  ;;   (case (-> answers :main-menu)
-  ;;     "quit" (swap! state assoc :quit true) 
-  ;;     "deploy" (swap! state assoc :deploy true)
-  ;;     (swap! state assoc :invalid true))
-  ;;   (println @state))
-  ;; (println "hello")
-
-  ;; {:main-menu "deploy"}
-  ;; {:alphabet ["B" "C"]}
-  )
 
 
 

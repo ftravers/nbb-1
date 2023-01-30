@@ -1,1 +1,1 @@
-((nil . ((cider-default-cljs-repl . nbb))))
+;; ((nil . ((cider-default-cljs-repl . nbb))))

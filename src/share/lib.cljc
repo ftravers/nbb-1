@@ -1,24 +1,37 @@
-(ns share.lib)
+(ns share.lib
+  (:require [clojure.string :as s]))
+
 (defn get-failed [state env]
-  (let [e (-> @state env :ms)
-        failed (reduce
-                (fn [acc [k v]]
-                  (when (= false v)
-                    (conj acc k)))
-                []
-                e)]
-    failed)
-  ;; 
-  )
+  (let [e (-> @state env :ms)]
+    (reduce
+     (fn [acc [k v]]
+       (if (= false v)
+         (conj acc k)
+         acc))
+     []
+     e)))
+
+(defn clean-ms [ms]
+  (-> ms
+      name
+      s/reverse
+      s/join
+      (subs 3)
+      s/reverse
+      s/join))
 
 (comment
   (def state
-    (r/atom
+    (atom
      {:stg
       {:ms {:rs-ok true
             :pr-ok false
             :pns-ok true
             :es-ok true}}}))
-  (get-failed state :stg)
+  (let [env :stg]
+    (->> env
+         (get-failed state)
+         (mapv clean-ms)))
+  (clean-ms :pr-ok)
   ;;
   )
