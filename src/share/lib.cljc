@@ -31,7 +31,8 @@
   (let [env :stg]
     (->> env
          (get-failed state)
-         (mapv clean-ms)))
+         (mapv clean-ms)
+         s/join))
   (clean-ms :pr-ok)
   ;;
   )

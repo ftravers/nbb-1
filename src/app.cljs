@@ -1,14 +1,10 @@
 (ns app
   (:require ;; ["moment$default" :as mmt]
-   ["inquirer$default" :as inq]
-   [promesa.core :as p]
    ["ink" :refer [render Text Box]]
    [reagent.core :as r]
-   ;; [nbb.core :refer [await]]
    [share.lib :as l]
-   ;; [cljs.core.async :refer [go]]
-   ;; [cljs.core.async.interop :refer-macros [<p!]]
-   ))
+   [clojure.string :as s]
+  ))
 
 ;; TODO: auto send commands to vterm to run nbb app.
 (def state
@@ -43,8 +39,11 @@
      [:> Box
       (if (every? #(= true (val %)) e)
         [:> Text {:color "green"} "Everything is good."]
-        [:> Text {:color "red"} "FAILED!!!"]
-        )]])
+        [:> Text {:color "red"}
+         (->> env
+              (l/get-failed state)
+              (mapv l/clean-ms)
+              s/join)])]])
   )
 (defn main []
   [:> Box {:flexDirection "column"}
